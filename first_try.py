@@ -1,5 +1,6 @@
 import numpy as np
 import pyaudio
+import time
 
 SLEEP_TIME = 0.1
 SAMPLE_RATE = 44100
@@ -22,4 +23,17 @@ def create_data():
     return return_data
 
 mData = pyAudioData(create_data())
-print(mData.get_next_frames(256))
+
+p=pyaudio.PyAudio()
+
+stream = p.open(format=pyaudio.paFloat32,
+                channels=1,
+                rate=SAMPLE_RATE,
+                output=True,
+                stream_callback=callback)
+
+while stream.is_active():
+    time.sleep(SLEEP_TIME)
+
+stream.close()
+p.terminate
