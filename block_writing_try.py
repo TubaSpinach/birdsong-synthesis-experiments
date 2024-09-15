@@ -4,10 +4,7 @@ import time
 
 SLEEP_TIME = 0.1
 SAMPLE_RATE = 44100
-
-def callback(input_data, frame_count, time_info, status):
-    mData.get_next_frames(frame_count)
-    return (mData, pyaudio.paContinue)
+CHUNK = 1024
 
 class pyAudioData:
     def __init__(self,frames) -> None:
@@ -29,12 +26,11 @@ p=pyaudio.PyAudio()
 stream = p.open(format=pyaudio.paFloat32,
                 channels=1,
                 rate=SAMPLE_RATE,
-                output=True,
-                stream_callback=callback)
+                output=True,)
 
-x=0
-while stream.is_active():
-    x+=1
+while len(data := mData.get_next_frames(CHUNK)):
+    stream.write(data)
 
 stream.close()
 p.terminate()
+
