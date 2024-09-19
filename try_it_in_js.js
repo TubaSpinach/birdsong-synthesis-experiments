@@ -37,13 +37,11 @@ writer.string("data");
 
 writer.uint32(dataLength);
 
-for (let i = 0; i < dataLength / 2; i++) {
-  const t = i / sampleRate;
-  const frequency = 256;
-  const volume = 0.6;
-  const val = Math.sin(2 * Math.PI * 256 * t) * volume;
-  writer.pcm16s(val);
+function output_function(t,frequency,volume) {
+  return Math.sin(2 * Math.PI * frequency * t) * volume;
 }
+
+writer.addData(output_function)
 
 const blob = new Blob([dataView.buffer], { type: 'application/octet-stream' });
 
@@ -72,5 +70,14 @@ function createWriter(dataView) {
       dataView.setInt16(pos, value, true);
       pos += 2;
     },
+    addData(fft) { //take in a function defined on time, frequence, and volume, and write the output at each time t
+      for (let i = 0; i < dataLength / 2; i++) {
+        const t = i / sampleRate;
+        const frequency = 256;
+        const volume = 0.6;
+        const val = fft(t,frequency,volume);
+        writer.pcm16s(val);
+      }
+    }
   }
 }
