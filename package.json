@@ -1,0 +1,13 @@
+{
+  "name": "birdsong 3D attempts",
+  "version": "0.0.1",
+  "description": "creating a 3D world of birdsong",
+  "author": "liam tait",
+  "devDependencies": {
+    "jest": "^29.6.4",
+    "jest-cli": "^29.6.4"
+  },
+  "scripts": {
+    "test": "jest"
+  }
+}
