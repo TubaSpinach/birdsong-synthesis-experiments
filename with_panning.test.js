@@ -1,4 +1,4 @@
-const panner_settings = {
+/*const panner_settings = {
     panningModel: "HRTF",
     distanceModel: "inverse",
     refDistance: 1,
@@ -15,8 +15,10 @@ let panner
 let audioCtx
 let listener
 let source
-
+*/
 const { beforeEach } = require('node:test')
+const {AudioContext} = require('node:web-audio-api');
+const {PannerNode} = require('web-audio-api');
 const initialize = require('./with_panning.js')
 
 function reset_values() {
