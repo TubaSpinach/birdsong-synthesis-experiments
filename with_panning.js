@@ -12,12 +12,15 @@ const panner_settings = {
     orientationY: 0,
     orientationZ: 0,
 }
-let panner
+let RW_panner
+let MD_panner
 let audioCtx
 let listener
-let source
+let RW_source
+let MD_source
+let mixer
 
-//const audioPlayer = document.getElementById("audioplayer");
+const audioPlayer = document.getElementById("audioplayer");
 
 
 //because Mozilla hasn't implemented listener.forwardX, etc.
@@ -50,17 +53,21 @@ function check_and_set_position(anObject,positionTriple) {
 
 function initialize() {
     audioCtx = new AudioContext();
-    panner = new PannerNode(audioCtx, panner_settings);
+    RW_panner= new PannerNode(audioCtx, panner_settings);
+    MD_panner = new PannerNode(audioCtx, panner_settings);
+    mixer = new GainNode(audioCtx);
     listener = audioCtx.listener;
 
     function initialize_positions() {
         check_and_set_orientation(listener,[0,0,-1],[0,1,0]);
         check_and_set_position(listener,[0,0,0])
-        check_and_set_position(panner,[0,1,2])
+        check_and_set_position(RW_panner,[-6,12,20])
+        check_and_set_position(MD_panner,[6,6,12])
+
     }
     initialize_positions()
 
-    function get_source(pathToSoundResource) {
+    function get_source(pathToSoundResource,source) {
         fetch(pathToSoundResource)
             .then((response)=>response.arrayBuffer())
             .then((downloadedBuffer)=>audioCtx.decodeAudioData(downloadedBuffer))
@@ -68,14 +75,20 @@ function initialize() {
                 source = new AudioBufferSourceNode(audioCtx, {
                     buffer: decodedBuffer,
                 });
-                source.connect(panner);
-                panner.connect(audioCtx.destination);
+                source.connect(RW_panner);
+                
                 console.log(`source ${pathToSoundResource} loaded!`);
             })
             .catch((e)=> console.error(`error loading source ${pathToSoundResource}: ${e.err}`));
+        return source
     }
-    get_source("res/RwOkalee.wav");
-    
+    get_source("res/RwOkalee.wav",RW_source).connect(RW_panner);
+    get_source("res/MdCoo.mp3",MD_source).connect(MD_panner);
+
+    mixer.gain.setValueAtTime(.5,audioCtx.currentTime);
+    RW_panner.connect(mixer);
+    MD_panner.connect(mixer);
+    mixer.connect(audioCtx.destination);
     return 1;
 }
 
